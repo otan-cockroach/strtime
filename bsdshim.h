@@ -4,6 +4,7 @@
 #include <ctype.h>
 #include <string.h>
 #include <time.h>
+#include <limits.h>
 
 #define locale_t int
 
@@ -66,6 +67,21 @@
 
 #define EPOCH_YEAR	1970
 #define EPOCH_WDAY	TM_THURSDAY
+
+#ifndef INT_STRLEN_MAXIMUM
+#define INT_STRLEN_MAXIMUM(type) \
+    ((TYPE_BIT(type) - TYPE_SIGNED(type)) * 302 / 1000 + 1 + TYPE_SIGNED(type))
+#endif
+
+#ifndef TYPE_BIT
+#define TYPE_BIT(type)  (sizeof (type) * CHAR_BIT)
+#endif
+
+#ifndef TYPE_SIGNED
+#define TYPE_SIGNED(type) (((type) -1) < 0)
+#endif
+
+#define isleap_sum(a, b)        isleap((a) % 400 + (b) % 400)
 
 struct mytm {
         int     tm_sec;         /* seconds after the minute [0-60] */

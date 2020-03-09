@@ -9,8 +9,31 @@ import (
 
 // #include <stdlib.h>
 // #include "bsdshim.h"
+// extern size_t strftime(char *s, size_t maxsize, const char *format, const struct tm *t);
 // extern int bsd_strptime(const char *s, const char *format, struct mytm *tm);
 import "C"
+
+func Strftime(t time.Time, layout string) (string, error) {
+	cLayout := C.CString(layout)
+	defer C.free(unsafe.Pointer(cLayout))
+	zone, offsetSecs := t.Location()
+	cTime := C.struct_mytm{
+		tm_sec:    int(t.Second()),
+		tm_min:    int(t.Minute()),
+		tm_hour:   int(t.Hour()),
+		tm_mday:   int(t.Day()),
+		tm_month:  int(t.Month()) - 1,
+		tm_year:   int(t.Year()) - 1900,
+		tm_wday:   int(t.Weekday()) - 1,
+		tm_yday:   int(t.YearDay()) - 1,
+		tm_gmtoff: int(offsetSecs),
+		tm_zone:   int(zone.String()),
+		tm_nsec:   int(t.Nanosecond()),
+	}
+	defer C.free(unsafe.Pointer(cValue))
+
+	return ret, nil
+}
 
 func Strptime(value string, layout string) (time.Time, error) {
 	cValue := C.CString(value)
